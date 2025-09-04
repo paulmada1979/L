@@ -51,6 +51,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signOut = async () => {
+    if (!supabase) {
+      console.log('AuthContext: Supabase client not available for logout');
+      clearAuthState();
+      return;
+    }
+
     try {
       console.log('AuthContext: Starting logout process...');
       
@@ -90,6 +96,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('AuthContext: Supabase client not available');
+      setError('Supabase connection not configured. Please connect to Supabase.');
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     // Set up auth state listener FIRST
@@ -171,7 +184,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []); // Empty dependency array to run only once
+  }, [supabase]); // Depend on supabase client availability
 
   const value: AuthContextType = {
     user,
